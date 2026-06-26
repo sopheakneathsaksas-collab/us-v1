@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Us ♡</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&family=Pacifico&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#FFC5D3">
+<link rel="icon" href="icons/icon-192.png">
+
+<style>
+    body {
+        background-color: #FFC5D3;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .container {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .title {
+        font-family: "Pacifico", cursive;
+        font-size: 45px;
+        color: #ff4f8b;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
+        margin-bottom: 8px;
+    }
+
+    .subtitle {
+        font-family: "Quicksand", sans-serif;
+        font-size: 18px;
+        color: #ff4f8b;
+        margin-bottom: 25px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 150px);
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .feel-btn {
+        background: rgba(255,255,255,0.85);
+        border: 1px solid #ffd1dc;
+        border-radius: 18px;
+        padding: 14px 10px;
+        font-family: "Quicksand", sans-serif;
+        font-size: 16px;
+        color: #ff4f8b;
+        cursor: pointer;
+        box-shadow: 0 6px 15px rgba(255,105,135,0.15);
+        transition: all 0.2s ease;
+    }
+
+    .feel-btn:hover {
+        transform: scale(1.05);
+        background: #ffe3ea;
+    }
+
+    #messageBox {
+        margin-top: 35px;
+        font-family: "Pacifico", cursive;
+        font-size: 32px;
+        color: #ff4f8b;
+        text-align: center;
+        max-width: 650px;
+        min-height: 80px;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+
+    .back-btn {
+        margin-top: 20px;
+        display: inline-block;
+        font-family: "Quicksand", sans-serif;
+        color: #ff4f8b;
+        text-decoration: none;
+        padding: 10px 16px;
+        background: rgba(255,255,255,0.7);
+        border-radius: 15px;
+    }
+
+    /* 🎵 MUSIC BUTTON */
+    .music-btn {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-family: "Quicksand", sans-serif;
+        color: #ff4f8b;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(255, 105, 135, 0.25);
+        z-index: 999;
+    }
+
+    @keyframes popIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- 🎵 MUSIC -->
+<audio id="bgMusic" loop>
+    <source src="Song2.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🎵 BUTTON -->
+<button class="music-btn" onclick="toggleMusic()">🎵 Play / Pause</button>
+
+<div class="container">
+
+    <div class="title">Today, I am feeling ...</div>
+    <div class="subtitle">Pick one ♡</div>
+
+    <div class="grid">
+        <div class="feel-btn" onclick="showMessage('happy')">Happy</div>
+        <div class="feel-btn" onclick="showMessage('sad')">Sad</div>
+        <div class="feel-btn" onclick="showMessage('tired')">Tired</div>
+        <div class="feel-btn" onclick="showMessage('unloved')">Unloved</div>
+        <div class="feel-btn" onclick="showMessage('scared')">Scared</div>
+        <div class="feel-btn" onclick="showMessage('annoyedothers')">Annoyed/Mad with Others</div>
+        <div class="feel-btn" onclick="showMessage('lonely')">Lonely</div>
+        <div class="feel-btn" onclick="showMessage('annoyedme')">Annoyed/Mad with Me</div>
+    </div>
+
+    <div class="footer">
+        Pick how you feel, I’ll take care of the rest 💕
+    </div>
+
+    <div id="messageBox"></div>
+
+    <a href="index.html" class="back-btn">← Go Back</a>
+</div>
+
+<script src="messages.js"></script>
+
+<script>
+function showMessage(feeling) {
+    if (!window.messages || !messages[feeling]) return;
+
+    const list = messages[feeling];
+    const random = list[Math.floor(Math.random() * list.length)];
+
+    const box = document.getElementById("messageBox");
+
+    box.innerHTML = "💖 " + random + " 💖";
+    box.style.opacity = "1";
+    box.style.transform = "translateY(0)";
+    box.style.animation = "popIn 0.4s ease";
+}
+
+/* 🎵 MUSIC */
+const music = document.getElementById("bgMusic");
+music.volume = 1.0;
+
+function toggleMusic() {
+    if (music.paused) {
+        music.play().catch(()=>{});
+    } else {
+        music.pause();
+    }
+}
+
+/* safer autoplay unlock */
+window.addEventListener("load", () => {
+    music.play().catch(() => {
+        document.body.addEventListener("click", () => {
+            music.play().catch(()=>{});
+        }, { once: true });
+    });
+});
+</script>
+
+</body>
+
+<!-- ⚙️ SERVICE WORKER -->
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+    .then(() => console.log("PWA Ready 💖"));
+}
+</script>
+
+</html>

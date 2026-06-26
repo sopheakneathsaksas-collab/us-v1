@@ -1,0 +1,23 @@
+{
+  "name": "Us ♡",
+  "short_name": "Us ♡",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#FFC5D3",
+  "theme_color": "#FFC5D3",
+  "orientation": "portrait",
+  "description": "A personal love app built for two people 💕",
+
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

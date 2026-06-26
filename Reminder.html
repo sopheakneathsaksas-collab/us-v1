@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Us ♡</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&family=Pacifico&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#FFC5D3">
+<link rel="icon" href="icons/icon-192.png">
+
+<!-- FIREBASE (REQUIRED) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"></script>
+
+<style>
+body {
+    background-color:#FFC5D3;
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    flex-direction:column;
+}
+
+.date-display {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Pacifico", cursive;
+    font-size: 26px;
+    color: #ff4f8b;
+    background: rgba(255, 255, 255, 0.35);
+    padding: 8px 18px;
+    border-radius: 20px;
+}
+
+.back-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-family: "Quicksand", sans-serif;
+    font-size: 14px;
+    background: white;
+    color: #ff4f8b;
+    padding: 8px 14px;
+    border-radius: 12px;
+    text-decoration: none;
+}
+
+.controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    font-family: "Quicksand", sans-serif;
+    font-size: 12px;
+    background: white;
+    color: #ff4f8b;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.heart-link img {
+    width: 220px;
+    cursor: pointer;
+}
+
+.records {
+    display: flex;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.tile {
+    width: 260px;
+    height: 260px;
+    background: white;
+    border-radius: 16px;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.tile h3 {
+    font-family: "Pacifico", cursive;
+    color: #ff4f8b;
+    text-align: center;
+}
+
+.entry {
+    font-family: "Quicksand", sans-serif;
+    font-size: 13px;
+    color: #444;
+    margin-bottom: 8px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: #ff4f8b;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<a href="index.html" class="back-button">⬅ Go Back</a>
+
+<div class="date-display" id="dateDisplay"></div>
+
+<audio id="bgMusic" loop>
+    <source src="Song3.mp3" type="audio/mpeg">
+</audio>
+
+<div class="controls">
+    <button class="btn" onclick="toggleMusic()">🎵 Play/Pause</button>
+    <button class="btn" onclick="clearAll('neathRecords')">Clear Neath</button>
+    <button class="btn" onclick="clearAll('hilangRecords')">Clear Hilang</button>
+</div>
+
+<a class="heart-link" href="#" onclick="handleClick()">
+    <img src="pink-heart.png" alt="heart">
+</a>
+
+<div class="records">
+    <div class="tile">
+        <h3>Neath's Records</h3>
+        <div id="neathRecords"></div>
+    </div>
+
+    <div class="tile">
+        <h3>Hilang's Records</h3>
+        <div id="hilangRecords"></div>
+    </div>
+</div>
+
+<script>
+/* =========================
+   FIREBASE CONFIG (REPLACE THIS)
+========================= */
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+
+/* =========================
+   PUSH NOTIFICATION SETUP
+========================= */
+async function initNotifications() {
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") return;
+
+        const token = await messaging.getToken({
+            vapidKey: "BKcS9LKimhcKdk-dSQOomwYUMznuJclTw8jwNEa_K41NJGyzdOt4X_WKriM1EYdiEf4duHv8QxxJtjLZkS9fR78 "
+        });
+
+        console.log("FCM Token:", token);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+window.addEventListener("load", initNotifications);
+
+/* =========================
+   SERVICE WORKER
+========================= */
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("firebase-messaging-sw.js");
+}
+
+/* =========================
+   MUSIC
+========================= */
+const music = document.getElementById("bgMusic");
+music.volume = 1.0;
+
+window.addEventListener("load", () => {
+    music.play().catch(() => {
+        document.body.addEventListener("click", () => {
+            music.play().catch(()=>{});
+        }, { once: true });
+    });
+});
+
+function toggleMusic(){
+    music.paused ? music.play() : music.pause();
+}
+
+/* =========================
+   NAME LOGIC
+========================= */
+function normalize(name){
+    return name.toLowerCase().trim();
+}
+
+function isNeath(name){
+    return ["neath","sopheakneath","sak sopheakneath"].includes(normalize(name));
+}
+
+function isHilang(name){
+    return ["hilang","hl","hong hilang","bby"].includes(normalize(name));
+}
+
+/* =========================
+   HEART CLICK
+========================= */
+function handleClick(){
+    const name = prompt("Who is clicking the heart? 💖");
+    if(!name) return;
+
+    const now = new Date();
+    const time = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const date = now.toLocaleDateString();
+
+    const record = { id: Date.now(), text: "" };
+
+    if(isNeath(name)){
+        record.text = `Neath missed Hilang at ${time} on ${date}`;
+        addRecord("neathRecords", record);
+        sendNotification(record.text);
+
+    } else if(isHilang(name)){
+        record.text = `Hilang missed Neath at ${time} on ${date}`;
+        addRecord("hilangRecords", record);
+        sendNotification(record.text);
+
+    } else {
+        alert("Name not recognized 💔");
+    }
+}
+
+/* =========================
+   SEND TO FIREBASE BACKEND (YOU WILL ADD LATER)
+========================= */
+function sendNotification(message){
+    fetch("YOUR_FIREBASE_FUNCTION_URL", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ message })
+    });
+}
+
+/* =========================
+   STORAGE
+========================= */
+function addRecord(boxId, record){
+    let data = JSON.parse(localStorage.getItem(boxId)) || [];
+    data.push(record);
+    localStorage.setItem(boxId, JSON.stringify(data));
+    renderAll();
+}
+
+function deleteRecord(boxId, id){
+    let data = JSON.parse(localStorage.getItem(boxId)) || [];
+    data = data.filter(r => r.id !== id);
+    localStorage.setItem(boxId, JSON.stringify(data));
+    renderAll();
+}
+
+function clearAll(boxId){
+    if(!confirm("Clear all records?")) return;
+    localStorage.removeItem(boxId);
+    renderAll();
+}
+
+/* =========================
+   RENDER
+========================= */
+function renderAll(){
+    ["neathRecords","hilangRecords"].forEach(id => {
+        const box = document.getElementById(id);
+        box.innerHTML = "";
+
+        let data = JSON.parse(localStorage.getItem(id)) || [];
+
+        data.forEach(record => {
+            const div = document.createElement("div");
+            div.className = "entry";
+            div.innerHTML = `
+                <span>${record.text}</span>
+                <button class="delete-btn" onclick="deleteRecord('${id}', ${record.id})">✖</button>
+            `;
+            box.appendChild(div);
+        });
+    });
+}
+
+/* =========================
+   DATE
+========================= */
+function updateDate(){
+    const today = new Date();
+    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+    document.getElementById("dateDisplay").innerText =
+        `${days[today.getDay()]}, ${today.getDate()} of ${months[today.getMonth()]}, ${today.getFullYear()}`;
+}
+
+/* INIT */
+updateDate();
+renderAll();
+</script>
+
+<!-- FIREBASE SERVICE WORKER FILE MUST EXIST -->
+</body>
+</html>

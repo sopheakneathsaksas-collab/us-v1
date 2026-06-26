@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Us ♡</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFC5D3">
+    <link rel="icon" href="icons/icon-192.png">
+
+    <style>
+        body {
+            background-color:#FFC5D3;
+            margin:0;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            flex-direction:column;
+        }
+
+        img {
+            width:300px;
+        }
+
+        .click-text {
+            margin-top: 18px;
+            font-family: "Pacifico", cursive;
+            font-size: 40px;
+            color: #ff4f8b;
+            cursor: pointer;
+            position: relative;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.6);
+        }
+
+        .click-text:hover {
+            transform: scale(1.03);
+            transition: 0.2s ease;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px 18px;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(255, 105, 135, 0.25);
+            white-space: nowrap;
+            border: 1px solid #ffd1dc;
+        }
+
+        .click-text:hover .dropdown {
+            display: block;
+        }
+
+        .dropdown a {
+            display: block;
+            font-family: "Quicksand", sans-serif;
+            font-size: 15px;
+            color: #ff4f8b;
+            text-decoration: none;
+            padding: 5px 8px;
+            border-radius: 10px;
+        }
+
+        .dropdown a:hover {
+            background: #ffe3ea;
+        }
+
+        /* 🎵 MUSIC BUTTON */
+        .music-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-family: "Quicksand", sans-serif;
+            color: #ff4f8b;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 105, 135, 0.25);
+        }
+
+        /* 📲 INSTALL BUTTON */
+        #installBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 14px;
+            background: white;
+            color: #ff4f8b;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-family: Quicksand;
+            cursor: pointer;
+        }
+
+        /* 💖 CUSTOM SPLASH SCREEN */
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FFC5D3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Pacifico", cursive;
+            font-size: 40px;
+            color: #ff4f8b;
+            z-index: 9999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 💖 CUSTOM SPLASH -->
+    <div id="splash">💖 Us ♡</div>
+
+    <!-- 🎵 Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="Song1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 🎵 Music Toggle Button -->
+    <button class="music-btn" onclick="toggleMusic()">🎵 Play / Pause</button>
+
+    <img src="pink-heart.png" alt="pink heart">
+
+    <div class="click-text">
+        Click Here to Explore! ♡
+
+        <div class="dropdown">
+            <a href="Feelings.html">🌸 Choose Based on How You Feel 🌸</a>
+            <a href="Reminder.html">💌 One-tap Thinking of You Reminder 💌</a>
+            <a href="Beentogether.html">💞 Been Together 💞</a>
+            <a href="Catch_Falling_Hearts_Fixed.html">🎮 A Mini Game 🎮</a>
+        </div>
+    </div>
+
+    <!-- 📲 Install App Button -->
+    <button id="installBtn">📲 Install App</button>
+
+    <script>
+        const music = document.getElementById("bgMusic");
+        music.volume = 1.0;
+
+        document.body.addEventListener("click", () => {
+            music.play().catch(()=>{});
+        }, { once: true });
+
+        function toggleMusic() {
+            if (music.paused) {
+                music.play().catch(()=>{});
+            } else {
+                music.pause();
+            }
+        }
+    </script>
+
+    <!-- 📲 INSTALL PWA -->
+    <script>
+        let deferredPrompt;
+
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        document.getElementById("installBtn").addEventListener("click", async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt = null;
+            } else {
+                alert("Install option will appear in your browser menu 💖");
+            }
+        });
+    </script>
+
+    <!-- 💖 SPLASH SCREEN SCRIPT -->
+    <script>
+        window.addEventListener("load", () => {
+            const splash = document.getElementById("splash");
+
+            setTimeout(() => {
+                splash.style.opacity = "0";
+                splash.style.transition = "0.6s ease";
+
+                setTimeout(() => splash.remove(), 600);
+            }, 900);
+        });
+    </script>
+
+    <!-- ⚙️ SERVICE WORKER -->
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js")
+            .then(() => console.log("PWA Ready 💖"));
+        }
+    </script>
+
+</body>
+</html>

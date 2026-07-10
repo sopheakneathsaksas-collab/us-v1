@@ -1,4 +1,4 @@
-const messages = {
+window.messages = {
 
     happy: [
         "Your smile is one of my favorite things in the world.",

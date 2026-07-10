@@ -153,40 +153,83 @@
 <script src="messages.js"></script>
 
 <script>
+// ===============================
+// FEELING MESSAGES
+// ===============================
 function showMessage(feeling) {
-    if (!window.messages || !messages[feeling]) return;
-
-    const list = messages[feeling];
-    const random = list[Math.floor(Math.random() * list.length)];
 
     const box = document.getElementById("messageBox");
 
+    // Check that messages.js loaded correctly
+    if (typeof window.messages === "undefined") {
+        box.innerHTML = "⚠️ Error: messages.js failed to load.";
+        box.style.opacity = "1";
+        return;
+    }
+
+    // Check the selected feeling exists
+    if (!window.messages[feeling]) {
+        box.innerHTML = "⚠️ No messages found for '" + feeling + "'";
+        box.style.opacity = "1";
+        return;
+    }
+
+    // Pick a random message
+    const list = window.messages[feeling];
+    const random = list[Math.floor(Math.random() * list.length)];
+
+    // Display it
     box.innerHTML = "💖 " + random + " 💖";
     box.style.opacity = "1";
     box.style.transform = "translateY(0)";
-    box.style.animation = "popIn 0.4s ease";
+    box.style.animation = "none";
+    void box.offsetWidth;
+    box.style.animation = "popIn .4s ease";
 }
 
-/* 🎵 MUSIC */
+
+// ===============================
+// MUSIC
+// ===============================
 const music = document.getElementById("bgMusic");
-music.volume = 1.0;
+
+music.volume = 1;
 
 function toggleMusic() {
+
     if (music.paused) {
-        music.play().catch(()=>{});
+
+        music.play().catch(err => console.log(err));
+
     } else {
+
         music.pause();
+
     }
+
 }
 
-/* safer autoplay unlock */
+// Unlock autoplay after first click
 window.addEventListener("load", () => {
+
     music.play().catch(() => {
+
         document.body.addEventListener("click", () => {
-            music.play().catch(()=>{});
+
+            music.play().catch(() => {});
+
         }, { once: true });
+
     });
+
 });
+
+
+// ===============================
+// DEBUG
+// ===============================
+console.log("Feelings page loaded.");
+console.log("messages =", window.messages);
 </script>
 
 </body>
